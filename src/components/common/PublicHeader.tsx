@@ -21,9 +21,9 @@ export default function PublicHeader() {
   }, []);
 
   const navItems = [
-    { name: "Bản đồ sự cố", href: "/map" },
+    { name: "Bản đồ", href: "/map" },
     { name: "Chiến dịch", href: "/actions" },
-    { name: "Thống kê SLA", href: "/stats" },
+    { name: "Thống kê", href: "/stats" },
   ];
 
   return (
