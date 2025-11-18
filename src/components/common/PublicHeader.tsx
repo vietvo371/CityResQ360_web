@@ -23,7 +23,7 @@ export default function PublicHeader() {
   const navItems = [
     { name: "Bản đồ", href: "/map" },
     { name: "Chiến dịch", href: "/actions" },
-    { name: "Thống kê", href: "/stats" },
+    { name: "Demo AI", href: "/ai-demo" },
   ];
 
   return (

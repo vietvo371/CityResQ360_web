@@ -11,7 +11,11 @@ import {
   ChevronDownIcon,
 } from "@/icons";
 import PublicHeader from "@/components/common/PublicHeader";
-import { MapPin, School, Wind, Zap, TrendingUp, Users, Globe, Lightbulb, Activity, BookOpen, ArrowRight, Map, Brain, MessageCircle, BarChart3, Heart, Sparkles, GraduationCap, AlertTriangle, Shield } from "lucide-react";
+import { MapPin, School, Wind, Zap, TrendingUp, Users, Globe, Lightbulb, Activity, BookOpen, ArrowRight, Map, Brain, MessageCircle, Sparkles, GraduationCap, AlertTriangle, Shield } from "lucide-react";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { Sparkles as SparklesUI } from "@/components/ui/sparkles";
+import { Meteors } from "@/components/ui/meteors";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
@@ -59,10 +63,10 @@ const previewData = {
 
 // Statistics for the landing page
 const stats = [
-  { label: "Phản ánh/ngày", value: 1200, suffix: "+", icon: Activity },
-  { label: "Điểm giám sát", value: 320, suffix: "+", icon: MapPin },
-  { label: "Đội phản ứng", value: 85, suffix: "+", icon: Users },
-  { label: "CivicPoint trao thưởng", value: 4.8, suffix: "M+", decimals: 1, icon: TrendingUp },
+  { label: "Phản ánh/ngày", value: 1200, suffix: "+", icon: Activity, iconPath: "/images/stats/activity-icon.png" },
+  { label: "Điểm giám sát", value: 320, suffix: "+", icon: MapPin, iconPath: "/images/stats/map-pin-icon.png"   },
+  { label: "Đội phản ứng", value: 85, suffix: "+", icon: Users, iconPath: "/images/stats/users-icon.png" },
+  { label: "CivicPoint trao thưởng", value: 4.8, suffix: "M+", decimals: 1, icon: TrendingUp, iconPath: "/images/stats/trending-up-icon.png" },
 ];
 
 const testimonialsRowOne = [
@@ -222,8 +226,35 @@ function AnimatedCounter({
   decimals?: number;
 }) {
   const [count, setCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const counterRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !hasStarted) {
+            setHasStarted(true);
+          }
+        });
+      },
+      { threshold: 0.3 } // Start animation when 30% visible
+    );
+
+    if (counterRef.current) {
+      observer.observe(counterRef.current);
+    }
+
+    return () => {
+      if (counterRef.current) {
+        observer.unobserve(counterRef.current);
+      }
+    };
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
     let animationFrame: number;
     let currentValue = 0;
     const startTime = Date.now();
@@ -246,10 +277,10 @@ function AnimatedCounter({
 
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
-  }, [target, decimals]);
+  }, [target, decimals, hasStarted]);
 
   return (
-    <span>
+    <span ref={counterRef}>
       {decimals > 0 ? count.toFixed(decimals) : count}
       {suffix}
     </span>
@@ -287,9 +318,9 @@ export default function HomePage() {
 
     const map = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "mapbox://styles/mapbox/standard",
       center: [106.6297, 10.8231], // TP.HCM
-      zoom: 10.5,
+      zoom: 18,
       pitch: 35,
       bearing: -15,
     });
@@ -445,18 +476,41 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative pt-24 pb-20 overflow-hidden sm:pt-40 sm:pb-40">
+        {/* Advanced Background Effects */}
         <div className="absolute inset-0">
+          {/* Base gradient */}
           <div className="absolute inset-0 bg-gradient-to-br from-white via-brand-50/30 to-brand-50/20 dark:from-gray-950 dark:via-brand-950/20 dark:to-brand-950/10" />
+          
+          {/* Animated beams - more visible */}
+          {/* <div className="opacity-60 dark:opacity-70">
+            <BackgroundBeams />
+          </div> */}
+          
+          {/* Meteors - more visible */}
+          <div className="absolute inset-0 opacity-70 dark:opacity-80">
+            <Meteors number={25} />
+          </div>
+          
+          {/* Sparkles - more visible */}
+          <SparklesUI className="opacity-70 dark:opacity-80" />
+          
+          {/* Grid overlay */}
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.05]" />
         </div>
 
         <div className="relative px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <div className="text-center">
+            {/* Badge with enhanced animation */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-gradient-to-r from-brand-50 to-brand-50 dark:from-brand-500/10 dark:to-brand-500/10 border border-brand-200/50 dark:border-brand-800/50 shadow-lg backdrop-blur-sm"
+              initial={{ opacity: 0, scale: 0.8, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ 
+                duration: 0.6,
+                type: "spring",
+                stiffness: 100,
+                damping: 10
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full bg-gradient-to-r from-brand-50 to-brand-50 dark:from-brand-500/10 dark:to-brand-500/10 border border-brand-200/50 dark:border-brand-800/50 shadow-lg backdrop-blur-sm hover:scale-105 transition-transform"
             >
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
@@ -467,17 +521,62 @@ export default function HomePage() {
               </span>
             </motion.div>
 
+            {/* Title with Advanced Animations */}
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
               className="mb-6 font-black text-gray-900 text-5xl sm:text-6xl lg:text-7xl dark:text-white leading-tight"
             >
-              CityResQ360 kết nối{" "}
-              <span className="bg-gradient-to-r from-brand-600 via-brand-500 to-brand-500 bg-clip-text text-transparent animate-gradient">
-                người dân, chính quyền và AI
-              </span>
-              {" "}để xử lý sự cố đô thị theo thời gian thực
+              {/* First line */}
+              {"Xử lý sự cố đô thị ".split(" ").map((word, index) => (
+                <motion.span
+                  key={`word1-${index}`}
+                  initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.1 + index * 0.1,
+                    ease: [0.4, 0, 0.2, 1],
+                  }}
+                  className="inline-block mr-2"
+                >
+                  {word}
+                </motion.span>
+              ))}
+              
+              {/* Highlighted word */}
+              {"thông minh".split(" ").map((word, index) => (
+                <motion.span
+                  key={`word2-${index}`}
+                  initial={{ opacity: 0, y: 20, scale: 0.8, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+                  transition={{
+                    duration: 0.6,
+                    delay: 0.5 + index * 0.1,
+                    ease: [0.4, 0, 0.2, 1],
+                  }}
+                  className="inline-block mr-2 bg-gradient-to-r from-brand-600 via-brand-500 to-brand-500 bg-clip-text text-transparent animate-gradient"
+                >
+                  {word}
+                </motion.span>
+              ))}
+              
+              <br />
+              
+              {/* Last line */}
+              {"với AI".split(" ").map((word, index) => (
+                <motion.span
+                  key={`word3-${index}`}
+                  initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.7 + index * 0.1,
+                    ease: [0.4, 0, 0.2, 1],
+                  }}
+                  className="inline-block mr-2"
+                >
+                  {word}
+                </motion.span>
+              ))}
             </motion.h1>
 
             <motion.p
@@ -495,18 +594,21 @@ export default function HomePage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.9 }}
               className="flex flex-col items-center justify-center gap-4 sm:flex-row mb-16"
             >
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link
-                  href="/map"
-                  className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white transition-all rounded-xl shadow-2xl bg-gradient-to-r from-brand-600 via-brand-500 to-brand-500 hover:shadow-2xl hover:shadow-brand-500/40 group"
+              {/* Primary CTA with Shimmer Effect */}
+              <Link href="/map">
+                <ShimmerButton
+                  background="#0e8ecf"
+                  className="group"
                 >
                   Mở bản đồ realtime
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </motion.div>
+                  <ArrowRight className="w-5 h-5 ml-2 inline group-hover:translate-x-1 transition-transform" />
+                </ShimmerButton>
+              </Link>
+
+              {/* Secondary CTA */}
               <motion.a
                 href="#features"
                 whileHover={{ scale: 1.05 }}
@@ -517,8 +619,9 @@ export default function HomePage() {
                 <motion.div
                   animate={{ y: [0, 5, 0] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
+                  className="ml-2"
                 >
-                  <ChevronDownIcon className="w-5 h-5 ml-2" />
+                  <ChevronDownIcon className="w-5 h-5" />
                 </motion.div>
               </motion.a>
             </motion.div>
@@ -665,7 +768,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-24 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 sm:py-40 relative overflow-hidden">
+      <section id="features" className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-950 sm:py-40 relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.02] dark:opacity-[0.03]" />
 
         <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
@@ -870,8 +973,14 @@ export default function HomePage() {
                 </div>
                 <div className="relative p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl dark:from-gray-900 dark:to-gray-800 lg:ml-12 border border-gray-200 dark:border-gray-700 shadow-xl">
                   <div className="absolute left-0 w-4 h-4 transform -translate-x-1/2 -translate-y-1/2 rounded-full top-1/2 bg-brand-500 shadow-lg hidden lg:block"></div>
-                  <div className="aspect-video bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/20 dark:to-brand-800/20 rounded-xl flex items-center justify-center">
-                    <MapPin className="w-16 h-16 text-brand-500 opacity-50" />
+                  <div className="aspect-video bg-gradient-to-br from-brand-100 to-brand-50 dark:from-brand-900/20 dark:to-brand-800/20 rounded-xl flex items-center justify-center p-8">
+                    <Image
+                      src="/images/how-it-works/step-1-report.svg"
+                      alt="Người dân phát hiện và báo cáo sự cố"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 </div>
               </motion.div>
@@ -886,8 +995,14 @@ export default function HomePage() {
               >
                 <div className="relative p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl dark:from-gray-900 dark:to-gray-800 lg:mr-12 lg:order-1 border border-gray-200 dark:border-gray-700 shadow-xl">
                   <div className="absolute right-0 w-4 h-4 transform translate-x-1/2 -translate-y-1/2 rounded-full top-1/2 bg-brand-500 shadow-lg hidden lg:block"></div>
-                  <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl flex items-center justify-center">
-                    <Brain className="w-16 h-16 text-amber-500 opacity-50" />
+                  <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/20 dark:to-amber-800/20 rounded-xl flex items-center justify-center p-8">
+                    <Image
+                      src="/images/how-it-works/step-2-ai-analysis.svg"
+                      alt="AI phân tích và xếp hạng sự cố"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 </div>
                 <div className="lg:order-2">
@@ -930,8 +1045,14 @@ export default function HomePage() {
                 </div>
                 <div className="relative p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl dark:from-gray-900 dark:to-gray-800 lg:ml-12 border border-gray-200 dark:border-gray-700 shadow-xl">
                   <div className="absolute left-0 w-4 h-4 transform -translate-x-1/2 -translate-y-1/2 rounded-full top-1/2 bg-purple-500 shadow-lg hidden lg:block"></div>
-                  <div className="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl flex items-center justify-center">
-                    <BarChart3 className="w-16 h-16 text-purple-500 opacity-50" />
+                  <div className="aspect-video bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl flex items-center justify-center p-8">
+                    <Image
+                      src="/images/how-it-works/step-3-dispatch.svg"
+                      alt="Điều phối và xử lý nhanh"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 </div>
               </motion.div>
@@ -946,8 +1067,14 @@ export default function HomePage() {
               >
                 <div className="relative p-6 bg-gradient-to-br from-gray-50 to-white rounded-2xl dark:from-gray-900 dark:to-gray-800 lg:mr-12 lg:order-1 border border-gray-200 dark:border-gray-700 shadow-xl">
                   <div className="absolute right-0 w-4 h-4 transform translate-x-1/2 -translate-y-1/2 rounded-full top-1/2 bg-pink-500 shadow-lg hidden lg:block"></div>
-                  <div className="aspect-video bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900/20 dark:to-pink-800/20 rounded-xl flex items-center justify-center">
-                    <Heart className="w-16 h-16 text-pink-500 opacity-50" />
+                  <div className="aspect-video bg-gradient-to-br from-pink-100 to-pink-50 dark:from-pink-900/20 dark:to-pink-800/20 rounded-xl flex items-center justify-center p-8">
+                    <Image
+                      src="/images/how-it-works/step-4-rewards.svg"
+                      alt="Thưởng CivicPoint minh bạch"
+                      width={400}
+                      height={300}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                 </div>
                 <div className="lg:order-2">
@@ -1005,8 +1132,14 @@ export default function HomePage() {
                 className="relative group"
               >
                 <div className="text-center p-8 rounded-2xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-brand-500 dark:hover:border-brand-500 transition-all hover:shadow-xl hover:scale-105">
-                  <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 shadow-lg group-hover:shadow-brand-500/50 transition-shadow">
-                    <stat.icon className="w-8 h-8 text-white" />
+                  <div className="flex items-center justify-center w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/20 dark:to-brand-800/20 shadow-lg group-hover:shadow-brand-500/30 transition-shadow p-3">
+                    <Image
+                      src={stat.iconPath}
+                      alt={stat.label}
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div className="mb-2 font-black text-gray-900 text-4xl dark:text-white">
                     <AnimatedCounter 

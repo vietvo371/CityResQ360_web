@@ -981,7 +981,7 @@ function MapContent() {
         </div>
 
         {/* Search Bar */}
-        <SearchBar onSearch={handleSearch} />
+        {/* <SearchBar onSearch={handleSearch} /> */}
 
         {/* Detail Panel */}
         {isDetailPanelOpen && selectedItem && (
